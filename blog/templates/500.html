@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Server Error • Blurry Shady{% endblock %}
+{% block content %}
+<section style="text-align:center;margin:4rem 0;">
+  <h1>Something went wrong</h1>
+  <p class="muted">That’s on us. Please try again in a bit.</p>
+  <p><a href="{% url 'blog:home' %}">← Go home</a></p>
+</section>
+{% endblock %}

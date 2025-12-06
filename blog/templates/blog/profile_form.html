@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<section class="profile-edit">
+  <h1>Edit Profile</h1>
+
+  <div class="profile-header">
+    {% if request.user.profile.avatar %}
+      <img class="profile-avatar" src="{{ request.user.profile.avatar.url }}" alt="avatar">
+    {% else %}
+      <img class="profile-avatar" src="{% static 'img/default-avatar.png' %}" alt="avatar">
+    {% endif %}
+    <span class="profile-username">@{{ request.user.username }}</span>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="form-row">
+      <label for="{{ form.bio.id_for_label }}">Bio:</label>
+      {{ form.bio }}
+    </div>
+
+    <div class="form-row">
+      <label for="{{ form.avatar.id_for_label }}">Avatar:</label>
+      {{ form.avatar }}
+    </div>
+
+    <div class="form-row">
+      <label for="{{ form.location.id_for_label }}">Location:</label>
+      {{ form.location }}
+    </div>
+
+    <button type="submit" class="btn btn--straight">Save changes</button>
+  </form>
+
+  <!-- Live preview goes here (next section) -->
+  <div class="avatar-preview-wrap">
+    <img id="avatarPreview" class="profile-avatar preview" 
+         src="{% if request.user.profile.avatar %}{{ request.user.profile.avatar.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" 
+         alt="avatar preview">
+    <small class="muted">Preview</small>
+  </div>
+</section>
+{% endblock %}

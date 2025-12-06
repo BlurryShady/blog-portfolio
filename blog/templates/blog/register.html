@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<section class="card" style="padding:24px;max-width:540px;margin:0 auto;">
+  <h1 style="margin-bottom:12px;">Create account</h1>
+  <p class="post-meta" style="margin-bottom:18px;">
+    Keep it simple now&mdash;just username, email, and password. You can flesh out your profile later.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn--straight">Sign up</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}@{{ profile_user.username }} • Profile{% endblock %}
+
+{% block meta %}
+  {% if profile_user.profile.bio %}
+    {% with desc=profile_user.profile.bio|striptags|truncatechars:155 %}
+      <meta name="description" content="{{ desc }}">
+      <link rel="canonical" href="{{ request.build_absolute_uri }}">
+      <meta property="og:type" content="profile">
+      <meta property="og:title" content="@{{ profile_user.username }} • Blurry Shady Blog">
+      <meta property="og:description" content="{{ desc }}">
+      <meta property="og:url" content="{{ request.build_absolute_uri }}">
+      <meta property="og:image" content="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'img/og-default.jpg' %}{% endif %}">
+      <meta name="twitter:title" content="@{{ profile_user.username }} • Blurry Shady Blog">
+      <meta name="twitter:description" content="{{ desc }}">
+      <meta name="twitter:image" content="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'img/og-default.jpg' %}{% endif %}">
+    {% endwith %}
+  {% elif profile_user.profile.location %}
+    {% with desc="Updates from @"|add:profile_user.username|add:" in "|add:profile_user.profile.location %}
+      <meta name="description" content="{{ desc }}">
+      <link rel="canonical" href="{{ request.build_absolute_uri }}">
+      <meta property="og:type" content="profile">
+      <meta property="og:title" content="@{{ profile_user.username }} • Blurry Shady Blog">
+      <meta property="og:description" content="{{ desc }}">
+      <meta property="og:url" content="{{ request.build_absolute_uri }}">
+      <meta property="og:image" content="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'img/og-default.jpg' %}{% endif %}">
+      <meta name="twitter:title" content="@{{ profile_user.username }} • Blurry Shady Blog">
+      <meta name="twitter:description" content="{{ desc }}">
+      <meta name="twitter:image" content="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'img/og-default.jpg' %}{% endif %}">
+    {% endwith %}
+  {% else %}
+    {% with desc="Stories and updates from @"|add:profile_user.username %}
+      <meta name="description" content="{{ desc }}">
+      <link rel="canonical" href="{{ request.build_absolute_uri }}">
+      <meta property="og:type" content="profile">
+      <meta property="og:title" content="@{{ profile_user.username }} • Blurry Shady Blog">
+      <meta property="og:description" content="{{ desc }}">
+      <meta property="og:url" content="{{ request.build_absolute_uri }}">
+      <meta property="og:image" content="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'img/og-default.jpg' %}{% endif %}">
+      <meta name="twitter:title" content="@{{ profile_user.username }} • Blurry Shady Blog">
+      <meta name="twitter:description" content="{{ desc }}">
+      <meta name="twitter:image" content="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'img/og-default.jpg' %}{% endif %}">
+    {% endwith %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="profile-header">
+  {% if profile_user.profile.avatar %}
+    <img class="u-avatar u-avatar--xl"
+         src="{{ profile_user.profile.avatar.url }}"
+         alt="{{ profile_user.username }}'s avatar">
+  {% else %}
+    <img class="u-avatar u-avatar--xl"
+         src="{% static 'img/default-avatar.png' %}"
+         alt="{{ profile_user.username }}'s avatar">
+  {% endif %}
+
+  <div>
+    <h1>@{{ profile_user.username }}</h1>
+
+    {% if profile_user.profile.location %}
+      <p class="muted">{{ profile_user.profile.location }}</p>
+    {% endif %}
+
+    {% if profile_user.profile.bio %}
+      <p>{{ profile_user.profile.bio|linebreaks }}</p>
+    {% endif %}
+
+    {% if request.user == profile_user %}
+      <p><a class="btn" href="{% url 'blog:profile_edit' %}">Edit Profile</a></p>
+    {% endif %}
+  </div>
+</section>
+
+<h2>Posts</h2>
+{% if posts %}
+  <div class="post-grid">
+    {% for post in posts %}
+      <article class="post-card">
+        {% if post.featured_image %}
+          <a href="{{ post.get_absolute_url }}">
+            <img class="post-thumb" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+          </a>
+        {% endif %}
+        <h3 class="post-title">
+          <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+        </h3>
+        <p class="post-meta">
+          {{ post.created_at|date:"M d, Y" }} in
+          <a href="{% url 'blog:category_detail' post.category.slug %}">{{ post.category.name }}</a>
+        </p>
+        <p class="post-snippet">{{ post.content|truncatechars:120 }}</p>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% if posts.paginator.num_pages > 1 %}
+    <div class="pagination">
+      {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}">« Prev</a>
+      {% endif %}
+      <span>Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}">Next »</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% else %}
+  <p class="muted">No published posts yet.</p>
+{% endif %}
+{% endblock %}

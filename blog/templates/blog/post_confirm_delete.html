@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Delete “{{ post.title }}” · Confirm{% endblock %}
+
+{% block content %}
+<section class="card danger" style="max-width:640px;margin:2rem auto;padding:1.25rem;border-radius:12px;">
+  <h2>Delete post?</h2>
+  <p>“{{ post.title }}” will be permanently deleted. This cannot be undone.</p>
+
+  <form method="post" style="margin-top:1rem">
+    {% csrf_token %}
+    <button class="btn danger">Yes, delete</button>
+    <a class="btn" href="{{ post.get_absolute_url }}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

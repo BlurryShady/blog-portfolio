@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Not Found • Blurry Shady{% endblock %}
+{% block content %}
+<section style="text-align:center;margin:4rem 0;">
+  <h1>404</h1>
+  <p class="muted">The page you’re looking for doesn’t exist.</p>
+  <p><a href="{% url 'blog:home' %}">← Go home</a></p>
+</section>
+{% endblock %}

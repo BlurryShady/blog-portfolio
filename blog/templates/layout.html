@@ -1,0 +1,110 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Blurry Shady's Blog{% endblock %}</title>
+
+  {% block meta %}
+    <meta name="description" content="Articles on coding, mindset, and projects by Blurry Shady.">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="Blurry Shady Blog">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Blurry Shady Blog">
+    <meta property="og:description" content="Articles on coding, mindset, and projects.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% static 'img/og-default.jpg' %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blurry Shady Blog">
+    <meta name="twitter:description" content="Articles on coding, mindset, and projects.">
+    <meta name="twitter:image" content="{% static 'img/og-default.jpg' %}">
+  {% endblock %}
+
+  <link rel="alternate" type="application/rss+xml" title="Blurry Shady RSS" href="{% url 'blog:feed_rss' %}">
+  <link rel="alternate" type="application/atom+xml" title="Blurry Shady Atom" href="{% url 'blog:feed_atom' %}">
+
+  <!-- bump the cache-buster -->
+  <!-- Favicons -->
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="any">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <meta name="theme-color" content="#0a0f14">
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=neo2">
+</head>
+<body>
+
+  <!-- Cinematic background -->
+  <div id="scene" aria-hidden="true">
+    <canvas id="bg-stars"></canvas>
+    <div id="eclipse" role="img" aria-label="Animated solar eclipse background"></div>
+    <div id="fireflies"></div>
+  </div>
+
+  <nav class="glass-nav">
+    <div class="nav-row">
+      <a href="{% url 'blog:home' %}">Home</a>
+      <a href="{% url 'blog:category_list' %}">Categories</a>
+
+      <form class="nav-search" method="get" action="{% url 'blog:home' %}">
+        <input name="q" placeholder="Search posts..." value="{{ request.GET.q }}">
+        <button class="btn btn--cyan">Search</button>
+      </form>
+
+      <div class="nav-right">
+        <button id="themeBtn" data-theme-toggle class="btn btn--cyan">Theme</button>
+        {% if request.user.is_authenticated %}
+          <a class="btn btn--cyan" href="{% url 'blog:post_create' %}">New Post</a>
+          <a class="btn btn--cyan" href="{% url 'blog:profile_edit' %}">Edit Profile</a>
+
+          <a class="nav-profile btn btn--cyan" href="{% url 'blog:profile_detail' request.user.username %}">
+            {% if request.user.profile.avatar %}
+              <img class="u-avatar u-avatar--xs" src="{{ request.user.profile.avatar.url }}" alt="@{{ request.user.username }}">
+            {% else %}
+              <img class="u-avatar u-avatar--xs" src="{% static 'img/default-avatar.png' %}" alt="">
+            {% endif %}
+            @{{ request.user.username }}
+          </a>
+
+          <form action="{% url 'blog:logout' %}" method="post" style="display:inline">
+            {% csrf_token %}<button class="btn btn--danger">Logout</button>
+          </form>
+        {% else %}
+          <a class="btn btn--cyan" href="{% url 'blog:login' %}">Login</a>
+          <a class="btn btn--cyan" href="{% url 'blog:register' %}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% if messages %}
+    <ul class="messages container">
+      {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div id="deleteModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <p>Delete this comment?</p>
+      <div class="modal-actions">
+        <button id="confirmDelete" class="btn btn--red" type="button">Delete</button>
+        <button id="cancelDelete" class="btn btn--cyan" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <small>© {{ now|date:"Y" }} Blurry Shady</small>
+    <nav>
+      <a href="{% url 'sitemap' %}" class="hidden-sitemap" target="_blank" rel="noopener">Sitemap</a>
+    </nav>
+  </footer>
+
+  <script src="{% static 'js/app.js' %}?v=neo1"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

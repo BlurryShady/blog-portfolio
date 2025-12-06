@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h1>Login</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn--cyan btn--straight">Log in</button>
+</form>
+<p class="post-meta" style="margin-top:12px;">
+  <a href="{% url 'blog:password_reset' %}">Forgot your password?</a>
+</p>
+{% endblock %}

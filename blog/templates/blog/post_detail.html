@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} • Blurry Shady{% endblock %}
+
+{% block meta %}
+  <meta name="description" content="{{ post.content|striptags|truncatechars:160 }}">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.content|striptags|truncatechars:160 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if post.featured_image %}
+    <meta property="og:image" content="{{ post.featured_image.url }}">
+    <meta name="twitter:image" content="{{ post.featured_image.url }}">
+  {% else %}
+    <meta property="og:image" content="{% static 'img/og-default.jpg' %}">
+    <meta name="twitter:image" content="{% static 'img/og-default.jpg' %}">
+  {% endif %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ post.title }}">
+  <meta name="twitter:description" content="{{ post.content|striptags|truncatechars:160 }}">
+{% endblock %}
+
+{% block content %}
+
+<article class="post-detail">
+  <h1>{{ post.title }}</h1>
+
+  <p class="post-meta">
+    by <a href="{% url 'blog:profile_detail' post.author.username %}">@{{ post.author.username }}</a>
+    ·
+    {% if post.published_at %}
+      {{ post.published_at|date:"M d, Y" }}
+    {% else %}
+      {{ post.created_at|date:"M d, Y" }}
+    {% endif %}
+    · in <a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a>
+  </p>
+
+  {% if is_preview %}
+    <div class="preview-banner">
+      <strong>Private preview.</strong> This post is still unpublished, so only you
+      and admins can view it.
+    </div>
+  {% endif %}
+
+  {% if request.user.is_authenticated %}
+    {% if request.user == post.author or request.user.is_staff %}
+      <p class="post-actions">
+        <a class="btn" href="{% url 'blog:post_edit' post.slug %}">Edit</a>
+        <a class="btn danger" href="{% url 'blog:post_delete' post.slug %}">Delete</a>
+      </p>
+    {% endif %}
+  {% endif %}
+
+  {% if post.featured_image %}
+    <img class="detail-thumb" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+  {% endif %}
+
+  <div class="post-body">
+    {{ post.content|linebreaks }}
+  </div>
+</article>
+
+<hr>
+
+<section class="comments">
+  <h3>Comments ({{ comments|length }})</h3>
+
+  {% if comments %}
+    <div class="comment-list">
+      {% for c in comments %}
+        <div class="comment">
+
+          <div class="comment-header">
+            {% with ava=c.author.profile.avatar %}
+              <img class="u-avatar u-avatar--md"
+                   src="{% if ava %}{{ ava.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}"
+                   alt="@{{ c.author.username }}">
+            {% endwith %}
+
+            <div class="comment-meta">
+              <strong>
+                <a href="{% url 'blog:profile_detail' c.author.username %}">@{{ c.author.username }}</a>
+              </strong>
+              · {{ c.created_at|date:"M d, Y H:i" }}
+
+              {% if request.user.is_authenticated %}
+                {% if request.user.pk == c.author.pk or request.user.pk == post.author.pk or request.user.is_staff %}
+                  <form method="post"
+                        action="{% url 'blog:comment_delete' c.pk %}"
+                        class="comment-inline-form"
+                        style="display:inline"
+                        data-comment-delete>
+                    {% csrf_token %}
+                    <button type="submit" class="btn danger btn--micro">Delete</button>
+                  </form>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="comment-body">
+            {{ c.content|linebreaks }}
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No comments yet.</p>
+  {% endif %}
+
+  <div class="comment-form">
+    {% if request.user.is_authenticated %}
+      <h4>Leave a comment</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn--straight comment-submit">Post comment</button>
+      </form>
+    {% else %}
+      <p><a href="{% url 'blog:login' %}?next={{ request.path }}">Log in</a> to comment.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

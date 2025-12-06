@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block title %}{{ category.name }} • Blurry Shady Blog{% endblock %}
+
+{% block meta %}
+  {% with desc=category.description|default:"Posts filed under "|add:category.name %}
+    <meta name="description" content="{{ desc|truncatechars:155 }}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ category.name }} • Blurry Shady Blog">
+    <meta property="og:description" content="{{ desc|truncatechars:155 }}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% static 'img/og-default.jpg' %}">
+    <meta name="twitter:title" content="{{ category.name }} • Blurry Shady Blog">
+    <meta name="twitter:description" content="{{ desc|truncatechars:155 }}">
+    <meta name="twitter:image" content="{% static 'img/og-default.jpg' %}">
+  {% endwith %}
+{% endblock %}
+{% block content %}
+<div class="home-container">
+  <h1 class="page-title">{{ category.name }}</h1>
+
+  {% if posts %}
+    <div class="post-grid">
+      {% for post in posts %}
+        <div class="post-card">
+          {% if post.featured_image %}
+            <img class="post-thumb" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+          {% endif %}
+          <h2 class="post-title">
+            <a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a>
+          </h2>
+          <p class="post-meta">
+           by <a href="{% url 'blog:profile_detail' post.author.username %}">
+                  @{{ post.author.username }}
+              </a> 
+              · {{ post.created_at|date:"M d, Y" }}
+
+          </p>
+          <p class="post-snippet">{{ post.content|truncatewords:25 }}</p>
+          <a class="read-more" href="{% url 'blog:post_detail' post.slug %}">Read more →</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No posts in this category yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% if page_obj and page_obj.has_other_pages %}
+<nav class="pagination">
+  {% with query=request.GET.urlencode %}
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if query %}&{{ query|cut:'page='|cut:'&' %}{% endif %}">← Prev</a>
+    {% endif %}
+
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if query %}&{{ query|cut:'page='|cut:'&' %}{% endif %}">Next →</a>
+    {% endif %}
+  {% endwith %}
+</nav>
+{% endif %}
+

@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Forbidden • Blurry Shady{% endblock %}
+{% block content %}
+<section style="text-align:center;margin:4rem 0;">
+  <h1>Access denied</h1>
+  <p class="muted">You don’t have permission to view this.</p>
+  <p><a href="{% url 'blog:home' %}">← Go home</a></p>
+</section>
+{% endblock %}

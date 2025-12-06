@@ -1,0 +1,28 @@
+{# expects `cats` in context #}
+<div class="category-grid">
+  {% for c in cats %}
+    <a class="category-card" href="{% url 'blog:category_detail' c.slug %}">
+      <div class="category-card__icon">#</div>
+      <div class="category-card__body">
+        <h3>{{ c.name }}</h3>
+
+        {% if c.description %}
+          <p class="muted">{{ c.description|truncatechars:120 }}</p>
+        {% endif %}
+
+        {# works with related_name="posts" or default post_set #}
+        {% if c.posts %}
+          {% with count=c.posts.count %}
+            <span class="category-card__meta">{{ count }} post{{ count|pluralize }}</span>
+          {% endwith %}
+        {% else %}
+          {% with count=c.post_set.count %}
+            <span class="category-card__meta">{{ count }} post{{ count|pluralize }}</span>
+          {% endwith %}
+        {% endif %}
+      </div>
+    </a>
+  {% empty %}
+    <p class="muted">No categories yet.</p>
+  {% endfor %}
+</div>

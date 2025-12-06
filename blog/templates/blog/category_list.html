@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}Categories • Blurry Shady{% endblock %}
+
+{% block content %}
+  <h1>Categories</h1>
+
+  {% if categories %}
+    {% with cats=categories %}
+      {% include "blog/partials/_category_grid.html" %}
+    {% endwith %}
+  {% elif object_list %}
+    {% with cats=object_list %}
+      {% include "blog/partials/_category_grid.html" %}
+    {% endwith %}
+  {% else %}
+    <p class="muted">No categories yet.</p>
+  {% endif %}
+{% endblock %}
