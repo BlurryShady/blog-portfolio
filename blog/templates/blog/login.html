@@ -7,7 +7,7 @@
   {{ form.as_p }}
   <button type="submit" class="btn btn--cyan btn--straight">Log in</button>
 </form>
-<p class="post-meta" style="margin-top:12px;">
-  <a href="{% url 'blog:password_reset' %}">Forgot your password?</a>
+<p style="margin-top:14px;">
+  <a class="btn btn--straight" href="{% url 'blog:password_reset' %}">Forgot your password?</a>
 </p>
 {% endblock %}
